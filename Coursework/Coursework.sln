@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34009.444
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GPU", "GPU\GPU.vcxproj", "{80E4221B-FD7C-4AF6-887B-9AD0A16B7ECB}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestDataGenerator", "TestDataGenerator\TestDataGenerator.vcxproj", "{8FDD95E2-3858-4AD6-83CA-EA5410438734}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{80E4221B-FD7C-4AF6-887B-9AD0A16B7ECB}.Debug|x64.ActiveCfg = Debug|x64
+		{80E4221B-FD7C-4AF6-887B-9AD0A16B7ECB}.Debug|x64.Build.0 = Debug|x64
+		{80E4221B-FD7C-4AF6-887B-9AD0A16B7ECB}.Release|x64.ActiveCfg = Release|x64
+		{80E4221B-FD7C-4AF6-887B-9AD0A16B7ECB}.Release|x64.Build.0 = Release|x64
+		{8FDD95E2-3858-4AD6-83CA-EA5410438734}.Debug|x64.ActiveCfg = Debug|x64
+		{8FDD95E2-3858-4AD6-83CA-EA5410438734}.Debug|x64.Build.0 = Debug|x64
+		{8FDD95E2-3858-4AD6-83CA-EA5410438734}.Release|x64.ActiveCfg = Release|x64
+		{8FDD95E2-3858-4AD6-83CA-EA5410438734}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {784C3A62-9C28-4286-A54B-7859DC714B55}
+	EndGlobalSection
+EndGlobal
