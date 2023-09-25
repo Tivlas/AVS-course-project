@@ -27,12 +27,8 @@ int main() {
    thrust::make_counting_iterator(size),
    a.begin(),
    GenRandInt());
-
 	thrust::host_vector<int> a_copy = a;
-
-	SaveToTxt(a_copy, base_dir + "3e1_int.txt");
-	//SaveToBinary(a_copy, base_dir + "3e1_int.dat");
-	//thrust::host_vector<int> v;
-	//ReadFromBinary(v, base_dir + "3e1_int.dat");
+	auto filename = base_dir + "3e1_int.dat";
+	SaveToBinary(a_copy, filename);
 	return 0;
 }
