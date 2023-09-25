@@ -7,45 +7,45 @@
 #include "Headers/matrix_add.cuh"
 #include "Headers/matrix_mul.cuh"
 #include <chrono>
+#include <fstream>
 
-void print(const thrust::host_vector<int>& m) {
-	for(auto& i : m) {
-		std::cout << i << ' ';
-	}
-	std::cout << '\n';
+const std::string base_dir = "D:\\University\\Courseworks\\AVS\\AVS-course-project\\Coursework\\TestDataGenerator\\data\\";
+
+template <typename T>
+void ReadFromBinary(thrust::host_vector<T>& v, const std::string& filename) {
+	std::ifstream file(filename, std::ios::binary);
+	size_t size = 0;
+	file.read(reinterpret_cast<char*>(&size), sizeof(size_t));
+	v.resize(size);
+	file.read(reinterpret_cast<char*>(v.data()), size * sizeof(T));
+	file.close();
 }
 
 int main() {
-	const size_t N = 3e4;
-	const size_t size = N * N;
-	std::cout << "elements: " << size << '\n';
-	thrust::default_random_engine rng(2324);
-	thrust::uniform_int_distribution<int> dist(1, 10);
-
-	thrust::host_vector<int> h_a(size);
-	thrust::host_vector<int> h_b(size);
-
-	auto s = std::chrono::high_resolution_clock::now();
-	for(int i = 0; i < size; ++i) {
-		h_a[i] = dist(rng);
-		h_b[i] = dist(rng);
-	}
-	auto e = std::chrono::high_resolution_clock::now();
-	auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(e - s);
-	std::cout << time.count() << "  " << "\n";
-
-
+	thrust::host_vector<int> h_a;
+	ReadFromBinary(h_a, base_dir + "3e4_int.dat");
+	thrust::host_vector<int> h_b = h_a;
 	thrust::device_vector<int> d_a = h_a;
 	thrust::device_vector<int> d_b = h_b;
-	thrust::device_vector<int> d_c(size);
-
+	thrust::device_vector<int> d_c(h_a.size());
+	const size_t N = sqrt(h_a.size());
+	std::cout << "Elements: " << h_a.size() << '\n';
 	dim3 blockSize(16, 16);
 	dim3 numBlocks((N + blockSize.x - 1) / blockSize.x, (N + blockSize.y - 1) / blockSize.y);
 
-	auto start = std::chrono::high_resolution_clock::now();
-	SqMatrixAddKernel << <numBlocks, blockSize >> > (thrust::raw_pointer_cast(d_c.data()), thrust::raw_pointer_cast(d_a.data()), thrust::raw_pointer_cast(d_b.data()), N);
-	auto end = std::chrono::high_resolution_clock::now();
-	auto elapsed_time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-	std::cout << elapsed_time.count() << "  ";
+	std::pair<int, int> time_count = {0,0};
+
+	for(int i = 10 - 1; i >= 0; i--) {
+		auto start = std::chrono::high_resolution_clock::now();
+		SqMatrixMulKernel << <numBlocks, blockSize >> > (thrust::raw_pointer_cast(d_c.data()), thrust::raw_pointer_cast(d_a.data()), thrust::raw_pointer_cast(d_b.data()), N);
+		auto end = std::chrono::high_resolution_clock::now();
+		auto elapsed_time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+		std::cout << elapsed_time.count() << '\n';
+		time_count.first += elapsed_time.count();
+		time_count.second++;
+	}
+
+	std::cout << "Average time of " << time_count.second << " calculations: " << static_cast<double>(time_count.first) / time_count.second;
+
 	return 0;
 }
