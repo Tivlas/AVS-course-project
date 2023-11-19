@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CPU", "CPU\CPU.vcxproj", "{
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CPU_not_parallel", "CPU_not_parallel\CPU_not_parallel.vcxproj", "{983B1B06-F097-4E52-B756-411B79438305}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GPU_not_parallel", "GPU_not_parallel\GPU_not_parallel.vcxproj", "{E38652EA-BCD3-496D-9071-496407D90D46}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -51,6 +53,14 @@ Global
 		{983B1B06-F097-4E52-B756-411B79438305}.Release|x64.Build.0 = Release|x64
 		{983B1B06-F097-4E52-B756-411B79438305}.Release|x86.ActiveCfg = Release|Win32
 		{983B1B06-F097-4E52-B756-411B79438305}.Release|x86.Build.0 = Release|Win32
+		{E38652EA-BCD3-496D-9071-496407D90D46}.Debug|x64.ActiveCfg = Debug|x64
+		{E38652EA-BCD3-496D-9071-496407D90D46}.Debug|x64.Build.0 = Debug|x64
+		{E38652EA-BCD3-496D-9071-496407D90D46}.Debug|x86.ActiveCfg = Debug|x64
+		{E38652EA-BCD3-496D-9071-496407D90D46}.Debug|x86.Build.0 = Debug|x64
+		{E38652EA-BCD3-496D-9071-496407D90D46}.Release|x64.ActiveCfg = Release|x64
+		{E38652EA-BCD3-496D-9071-496407D90D46}.Release|x64.Build.0 = Release|x64
+		{E38652EA-BCD3-496D-9071-496407D90D46}.Release|x86.ActiveCfg = Release|x64
+		{E38652EA-BCD3-496D-9071-496407D90D46}.Release|x86.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

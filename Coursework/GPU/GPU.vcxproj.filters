@@ -3,8 +3,4 @@
   <ItemGroup>
     <CudaCompile Include="kernel.cu" />
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Headers\matrix_add.cuh" />
-    <ClInclude Include="Headers\matrix_mul.cuh" />
-  </ItemGroup>
 </Project>
