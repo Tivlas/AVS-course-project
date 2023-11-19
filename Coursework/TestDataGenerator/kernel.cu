@@ -29,10 +29,6 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	std::string fileName = argv[1];
-	if(!std::ofstream(fileName).good()) {
-		std::cout << "Invalid file";
-		return 0;
-	}
 	const size_t size = N * N;
 	thrust::device_vector<int> a(size);
 	thrust::transform(thrust::make_counting_iterator(0ULL), thrust::make_counting_iterator(size), a.begin(), GenRandInt());
