@@ -7,8 +7,6 @@
 #include <functional>
 #include <thread>
 #include <atomic>
-#include <sys/stat.h>
-#include <filesystem>
 #include <exception>
 
 template <typename T>
@@ -25,11 +23,12 @@ void readFromBinary(std::vector<T>& v, const std::string& filename) {
 
 void matrixMul(const std::vector<int>& a, const std::vector<int>& b, std::vector<int>& result) {
 	size_t size = sqrt(a.size());
-#pragma omp parallel for
+	int j, k;
+#pragma omp parallel for private(j, k)
 	for(int i = 0; i < size; i++) {
-		for(int j = 0; j < size; j++) {
+		for(j = 0; j < size; j++) {
 			result[i * size + j] = 0;
-			for(int k = 0; k < size; k++) {
+			for(k = 0; k < size; k++) {
 				result[i * size + j] += a[i * size + k] * b[k * size + j];
 			}
 		}
@@ -38,8 +37,9 @@ void matrixMul(const std::vector<int>& a, const std::vector<int>& b, std::vector
 
 void matrixAdd(const std::vector<int>& a, const std::vector<int>& b, std::vector<int>& result) {
 	size_t size = a.size();
-#pragma omp parallel for //shared(a, b, result) private(i)
-	for(int i = 0; i < size; i++) {
+	int i;
+#pragma omp parallel for private(i) 
+	for(i = 0; i < size; i++) {
 		result[i] = a[i] + b[i];
 	}
 }
