@@ -74,8 +74,6 @@ auto measureTime(const std::vector<int>& a, const std::vector<int>& b, std::vect
 	return elapsed_time.count();
 }
 
-const std::string base_dir = "D:\\University\\Courseworks\\AVS\\AVS-course-project\\Coursework\\TestDataGenerator\\data\\";
-
 bool fileExists(const std::string& name) {
 	struct stat buffer;
 	return stat(name.c_str(), &buffer) == 0;
@@ -93,11 +91,11 @@ int main(int argc, char* argv[]) {
 			return 0;
 		}
 	}
-	std::vector<int> a;
 	if(!fileExists(argv[1])) {
 		std::cout << "File does not exist!\n";
 		return 0;
 	}
+	std::vector<int> a;
 	readFromBinary(a, argv[1]);
 	std::vector<int> b = a;
 	std::vector<int> result(a.size(), 0);
