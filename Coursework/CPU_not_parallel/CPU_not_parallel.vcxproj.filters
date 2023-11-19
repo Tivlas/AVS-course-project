@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\CPU\CPU_not_parallel.cpp">
+    <ClCompile Include="CPU_not_parallel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
