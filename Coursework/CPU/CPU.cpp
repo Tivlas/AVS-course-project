@@ -8,10 +8,13 @@
 #include <thread>
 #include <atomic>
 #include <sys/stat.h>
+#include <filesystem>
+#include <exception>
 
 template <typename T>
 void readFromBinary(std::vector<T>& v, const std::string& filename) {
 	std::ifstream file(filename, std::ios::binary);
+	if(!file.good()) throw std::invalid_argument("Invalid file!");
 	size_t size = 0;
 	file.read(reinterpret_cast<char*>(&size), sizeof(size_t));
 	v.resize(size);
@@ -74,11 +77,6 @@ auto measureTime(const std::vector<int>& a, const std::vector<int>& b, std::vect
 	return elapsed_time.count();
 }
 
-bool fileExists(const std::string& name) {
-	struct stat buffer;
-	return stat(name.c_str(), &buffer) == 0;
-}
-
 int main(int argc, char* argv[]) {
 	if(argc != 3) {
 		std::cout << "Requires 2 args\n";
@@ -91,12 +89,14 @@ int main(int argc, char* argv[]) {
 			return 0;
 		}
 	}
-	if(!fileExists(argv[1])) {
-		std::cout << "File does not exist!\n";
+	std::vector<int> a;
+	try {
+		readFromBinary(a, argv[1]);
+	}
+	catch(const std::exception& e) {
+		std::cout << e.what();
 		return 0;
 	}
-	std::vector<int> a;
-	readFromBinary(a, argv[1]);
 	std::vector<int> b = a;
 	std::vector<int> result(a.size(), 0);
 	omp_set_num_threads(omp_get_max_threads());

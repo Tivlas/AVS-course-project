@@ -5,6 +5,7 @@
 template <typename T>
 void SaveToBinary(const thrust::host_vector<T>& v, const std::string& filename) {
 	std::ofstream file(filename, std::ios::binary | std::ios::trunc);
+	if(!file.good()) throw std::invalid_argument("Invalid file!");
 	file.seekp(0);
 	size_t size = v.size();
 	file.write(reinterpret_cast<const char*>(&size), sizeof(size_t));
