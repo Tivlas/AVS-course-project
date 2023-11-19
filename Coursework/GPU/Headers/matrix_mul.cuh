@@ -2,7 +2,7 @@
 #include "device_launch_parameters.h"
 
 template <typename T>
-__global__ void SqMatrixMulKernel(T* c, const T* a, const T* b, size_t N) {
+__global__ void matrixMulKernel(T* c, const T* a, const T* b, size_t N) {
 	size_t i = blockIdx.x * blockDim.x + threadIdx.x;
 	size_t j = blockIdx.y * blockDim.y + threadIdx.y;
 	if(i < N && j < N) {
