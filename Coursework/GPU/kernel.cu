@@ -16,11 +16,10 @@ __global__ void matrixMulKernel(T* c, const T* a, const T* b, size_t N) {
 	size_t j = blockIdx.y * blockDim.y + threadIdx.y;
 	if(i < N && j < N) {
 		auto idx = i * N + j;
-		T sum = 0;
+		c[idx] = 0;
 		for(size_t k = 0; k < N; k++) {
-			sum += a[i * N + k] * b[k * N + j];
+			c[idx] += a[i * N + k] * b[k * N + j];
 		}
-		c[idx] = sum;
 	}
 }
 
@@ -100,15 +99,14 @@ int main(int argc, char* argv[]) {
 		std::cout << e.what();
 		return 0;
 	}
-	thrust::host_vector<int> h_b = h_a;
 	thrust::device_vector<int> d_a = h_a;
-	thrust::device_vector<int> d_b = h_b;
+	thrust::device_vector<int> d_b = h_a;
 	thrust::device_vector<int> d_c(h_a.size());
 	const size_t N = sqrt(h_a.size());
 	dim3 blockSize(16, 16);
 	dim3 numBlocks((N + blockSize.x - 1) / blockSize.x, (N + blockSize.y - 1) / blockSize.y);
 
 	auto time = measureTime(d_a, d_b, d_c, N, blockSize, numBlocks, argv[2]);
-	std::cout << time;
+	std::cout << time << '\n';
 	return 0;
 }
