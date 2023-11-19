@@ -12,25 +12,21 @@
 
 template <typename T>
 __global__ void matrixMulKernel(T* c, const T* a, const T* b, size_t N) {
-	size_t i = blockIdx.x * blockDim.x + threadIdx.x;
-	size_t j = blockIdx.y * blockDim.y + threadIdx.y;
-	if(i < N && j < N) {
-		auto idx = i * N + j;
-		T sum = 0;
-		for(size_t k = 0; k < N; k++) {
-			sum += a[i * N + k] * b[k * N + j];
+	for(int i = 0; i < N; i++) {
+		for(int j = 0; j < N; j++) {
+			c[i * N + j] = 0;
+			for(int k = 0; k < N; k++) {
+				c[i * N + j] += a[i * N + k] * b[k * N + j];
+			}
 		}
-		c[idx] = sum;
 	}
 }
 
 template <typename T>
 __global__ void matrixAddKernel(T* c, const T* a, const T* b, size_t N) {
-	size_t i = threadIdx.x + blockIdx.x * blockDim.x;
-	size_t j = threadIdx.y + blockIdx.y * blockDim.y;
-	if(i < N && j < N) {
-		auto idx = i * N + j;
-		c[idx] = a[idx] + b[idx];
+	N *= N;
+	for(int i = 0; i < N; i++) {
+		c[i] = a[i] + b[i];
 	}
 }
 
@@ -100,12 +96,11 @@ int main(int argc, char* argv[]) {
 		std::cout << e.what();
 		return 0;
 	}
-	thrust::host_vector<int> h_b = h_a;
 	thrust::device_vector<int> d_a = h_a;
-	thrust::device_vector<int> d_b = h_b;
+	thrust::device_vector<int> d_b = h_a;
 	thrust::device_vector<int> d_c(h_a.size());
 	const size_t N = sqrt(h_a.size());
 	auto time = measureTime(d_a, d_b, d_c, N, argv[2]);
-	std::cout << time;
+	std::cout << time << '\n';
 	return 0;
 }
