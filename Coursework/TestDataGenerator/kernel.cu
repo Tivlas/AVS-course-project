@@ -4,6 +4,7 @@
 #include <thrust/device_vector.h>
 #include <thrust/host_vector.h>
 #include <fstream>
+#include <type_traits>
 
 template <typename T>
 void SaveToBinary(const thrust::host_vector<T>& v, const std::string& filename) {
@@ -15,20 +16,32 @@ void SaveToBinary(const thrust::host_vector<T>& v, const std::string& filename) 
 	file.close();
 }
 
-struct GenRandInt {
+template <typename T>
+using DistributionType = typename std::conditional<std::is_integral_v<T>, thrust::uniform_int_distribution<T>, thrust::uniform_real_distribution<T>>::type;
+
+template <typename T>
+struct GenRand {
 	__device__
 		int operator () (int idx) {
 		thrust::default_random_engine rand_eng;
-		thrust::uniform_int_distribution<int> uni_dist;
+		DistributionType<T> uni_dist;
 		rand_eng.discard(idx);
 		return uni_dist(rand_eng);
 	}
 };
 
+template <typename T>
+void generate(const std::string& fileName, size_t size) {
+	thrust::device_vector<T> a(size);
+	thrust::transform(thrust::make_counting_iterator(0ULL), thrust::make_counting_iterator(size), a.begin(), GenRand<T>());
+	thrust::host_vector<T> a_copy = a;
+	SaveToBinary<T>(a_copy, fileName);
+}
+
 int main(int argc, char* argv[]) {
 	size_t N = 3;
-	if(argc != 3) {
-		std::cout << "Requires 2 args\n";
+	if(argc != 4) {
+		std::cout << "Requires 3 args\n";
 		return 0;
 	}
 	else {
@@ -37,17 +50,23 @@ int main(int argc, char* argv[]) {
 			std::cout << "Invalid size parameter (2 <= size <= 30000).\n";
 			return 0;
 		}
+		std::string dataType = argv[3];
+		if(dataType != "f" && dataType != "i") {
+			std::cout << "Invalid data type (f or i).\n";
+			return 0;
+		}
 	}
 	std::string fileName = argv[1];
+	std::string dataType = argv[3];
 	const size_t size = N * N;
-	thrust::device_vector<int> a(size);
-	thrust::transform(thrust::make_counting_iterator(0ULL), thrust::make_counting_iterator(size), a.begin(), GenRandInt());
-	thrust::host_vector<int> a_copy = a;
-	try {
-		SaveToBinary(a_copy, fileName);
+	if(dataType == "f") {
+		generate<float>(fileName, size);
 	}
-	catch(const std::exception& e) {
-		std::cout << e.what();
+	else if (dataType == "i") {
+		generate<int>(fileName, size);
+	}
+	else {
+		std::cout << "Nothing was generated! Invalid data type.";
 	}
 	return 0;
 }
