@@ -38,7 +38,7 @@ struct GenRand {
 template <typename T>
 void generate(const std::string& fileName, size_t size) {
 	thrust::device_vector<T> a(size);
-	thrust::transform(thrust::make_counting_iterator(0ULL), thrust::make_counting_iterator(size), a.begin(), GenRand<T>());
+	thrust::transform(thrust::make_counting_iterator(0ULL), thrust::make_counting_iterator(static_cast<unsigned long long>(size)), a.begin(), GenRand<T>());
 	thrust::host_vector<T> a_copy = a;
 	SaveToBinary<T>(a_copy, fileName);
 }
