@@ -23,9 +23,9 @@ void readFromBinary(std::vector<T>& v, const std::string& filename) {
 template <typename T>
 void matrixMul(const std::vector<T>& a, const std::vector<T>& b, std::vector<T>& result) {
 	size_t size = sqrt(a.size());
-	int j, k, i;
+	int j, k;
 #pragma omp parallel for private(j, k)
-	for(i = 0; i < size; i++) {
+	for(int i = 0; i < size; i++) {
 		for(j = 0; j < size; j++) {
 			result[i * size + j] = 0;
 			for(k = 0; k < size; k++) {

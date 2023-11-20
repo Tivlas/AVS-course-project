@@ -3,12 +3,10 @@
 #include "device_launch_parameters.h"
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
-#include <thrust/random.h>
 #include <chrono>
 #include <fstream>
 #include <atomic>
 #include <thread>
-#include <functional>
 
 template <typename T>
 __global__ void matrixMulKernel(T* c, const T* a, const T* b, size_t N) {
@@ -94,7 +92,6 @@ void calculate(std::string op, const std::string& fileName) {
 	const size_t N = sqrt(h_a.size());
 	dim3 blockSize(16, 16);
 	dim3 numBlocks((N + blockSize.x - 1) / blockSize.x, (N + blockSize.y - 1) / blockSize.y);
-
 	auto time = measureTime<T>(d_a, d_b, d_c, N, blockSize, numBlocks, op);
 	std::cout << time << '\n';
 }
