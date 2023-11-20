@@ -75,9 +75,27 @@ auto measureTime(const thrust::device_vector<T>& a, thrust::device_vector<T>& b,
 	return elapsed_time.count();
 }
 
+template <typename T>
+void calculate(std::string op, const std::string& fileName) {
+	thrust::host_vector<T> h_a;
+	try {
+		ReadFromBinary<T>(h_a, fileName);
+	}
+	catch(const std::exception& e) {
+		std::cout << e.what();
+		return;
+	}
+	thrust::device_vector<T> d_a = h_a;
+	thrust::device_vector<T> d_b = h_a;
+	thrust::device_vector<T> d_c(h_a.size());
+	const size_t N = sqrt(h_a.size());
+	auto time = measureTime<T>(d_a, d_b, d_c, N, op);
+	std::cout << time << '\n';
+}
+
 int main(int argc, char* argv[]) {
-	if(argc != 3) {
-		std::cout << "Requires 2 args\n";
+	if(argc != 4) {
+		std::cout << "Requires 3 args\n";
 		return 0;
 	}
 	else {
@@ -86,21 +104,20 @@ int main(int argc, char* argv[]) {
 			std::cout << "Usage: <file_path> <function (m or a)>\n";
 			return 0;
 		}
+		std::string dataType = argv[3];
+		if(dataType != "i" && dataType != "f") {
+			std::cout << "Usage: <file_path> <function (m or a)> <dataType (i or f)\n";
+			return 0;
+		}
 	}
 	std::string fileName = argv[1];
-	thrust::host_vector<int> h_a;
-	try {
-		ReadFromBinary(h_a, fileName);
+	std::string op = argv[2];
+	std::string dataType = argv[3];
+	if(dataType == "i") {
+		calculate<int>(op, fileName);
 	}
-	catch(const std::exception& e) {
-		std::cout << e.what();
-		return 0;
+	else if(dataType == "f") {
+		calculate<float>(op, fileName);
 	}
-	thrust::device_vector<int> d_a = h_a;
-	thrust::device_vector<int> d_b = h_a;
-	thrust::device_vector<int> d_c(h_a.size());
-	const size_t N = sqrt(h_a.size());
-	auto time = measureTime(d_a, d_b, d_c, N, argv[2]);
-	std::cout << time << '\n';
 	return 0;
 }
