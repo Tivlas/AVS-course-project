@@ -1,5 +1,4 @@
-﻿#pragma once
-#include "cuda_runtime.h"
+﻿#include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
@@ -55,7 +54,7 @@ void printProgressIndicator(std::atomic<bool>& isCalculating) {
 }
 
 template <typename T>
-auto measureTime(const thrust::device_vector<T>& a, thrust::device_vector<T>& b, thrust::device_vector<T>& result, size_t N, dim3 blockSize, dim3 numBlocks, std::string op) {
+long long measureTime(const thrust::device_vector<T>& a, thrust::device_vector<T>& b, thrust::device_vector<T>& result, size_t N, dim3 blockSize, dim3 numBlocks, std::string op) {
 	std::atomic<bool> isCalculating;
 	isCalculating.store(true);
 	std::thread progressThread(printProgressIndicator, std::ref(isCalculating));
