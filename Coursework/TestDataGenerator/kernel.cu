@@ -21,10 +21,15 @@ using DistributionType = typename std::conditional<std::is_integral_v<T>, thrust
 
 template <typename T>
 struct GenRand {
+	thrust::default_random_engine rand_eng;
+	DistributionType<T> uni_dist;
+
 	__device__
-		int operator () (int idx) {
-		thrust::default_random_engine rand_eng;
-		DistributionType<T> uni_dist;
+		GenRand(): rand_eng(thrust::default_random_engine{static_cast<unsigned int>(clock())}) {
+	}
+
+	__device__
+		T operator () (int idx) {
 		rand_eng.discard(idx);
 		return uni_dist(rand_eng);
 	}
