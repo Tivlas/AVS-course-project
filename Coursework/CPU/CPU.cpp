@@ -20,12 +20,12 @@ void readFromBinary(std::vector<T>& v, const std::string& filename) {
 	file.close();
 }
 
-
-void matrixMul(const std::vector<int>& a, const std::vector<int>& b, std::vector<int>& result) {
+template <typename T>
+void matrixMul(const std::vector<T>& a, const std::vector<T>& b, std::vector<T>& result) {
 	size_t size = sqrt(a.size());
-	int j, k;
+	int j, k, i;
 #pragma omp parallel for private(j, k)
-	for(int i = 0; i < size; i++) {
+	for(i = 0; i < size; i++) {
 		for(j = 0; j < size; j++) {
 			result[i * size + j] = 0;
 			for(k = 0; k < size; k++) {
@@ -35,20 +35,14 @@ void matrixMul(const std::vector<int>& a, const std::vector<int>& b, std::vector
 	}
 }
 
-void matrixAdd(const std::vector<int>& a, const std::vector<int>& b, std::vector<int>& result) {
+template <typename T>
+void matrixAdd(const std::vector<T>& a, const std::vector<T>& b, std::vector<T>& result) {
 	size_t size = a.size();
 	int i;
 #pragma omp parallel for private(i) 
 	for(i = 0; i < size; i++) {
 		result[i] = a[i] + b[i];
 	}
-}
-
-void print(const std::vector<int> m) {
-	for(auto i : m) {
-		std::cout << i << ' ';
-	}
-	std::cout << '\n';
 }
 
 void printProgressIndicator(std::atomic<bool>& isCalculating) {
@@ -63,8 +57,9 @@ void printProgressIndicator(std::atomic<bool>& isCalculating) {
 	std::cout << '\n';
 }
 
-auto measureTime(const std::vector<int>& a, const std::vector<int>& b, std::vector<int>& result,
-				  std::function<void(const std::vector<int>& a, const std::vector<int>& b, std::vector<int>& result)> matrix_func) {
+template <typename T>
+auto measureTime(const std::vector<T>& a, const std::vector<T>& b, std::vector<T>& result,
+				  std::function<void(const std::vector<T>& a, const std::vector<T>& b, std::vector<T>& result)> matrix_func) {
 	std::atomic<bool> isCalculating;
 	isCalculating.store(true);
 	std::thread progressThread(printProgressIndicator, std::ref(isCalculating));
@@ -77,9 +72,27 @@ auto measureTime(const std::vector<int>& a, const std::vector<int>& b, std::vect
 	return elapsed_time.count();
 }
 
+template <typename T>
+void calculate(std::string op, const std::string& fileName) {
+	std::vector<T> a;
+	try {
+		readFromBinary(a, fileName);
+	}
+	catch(const std::exception& e) {
+		std::cout << e.what();
+		return;
+	}
+	std::vector<T> b = a;
+	std::vector<T> result(a.size(), 0);
+	std::function<void(const std::vector<T>& a, const std::vector<T>& b, std::vector<T>& result)> matrix_func;
+	matrix_func = op == "m" ? matrixMul<T> : matrixAdd<T>;
+	auto time = measureTime<T>(a, b, result, matrix_func);
+	std::cout << time;
+}
+
 int main(int argc, char* argv[]) {
-	if(argc != 3) {
-		std::cout << "Requires 2 args\n";
+	if(argc != 4) {
+		std::cout << "Requires 3 args\n";
 		return 0;
 	}
 	else {
@@ -88,23 +101,21 @@ int main(int argc, char* argv[]) {
 			std::cout << "Usage: <file_path> <function (m or a)>\n";
 			return 0;
 		}
+		std::string dataType = argv[3];
+		if(dataType != "i" && dataType != "f") {
+			std::cout << "Usage: <file_path> <function (m or a)> <dataType (i or f)\n";
+			return 0;
+		}
 	}
-	std::vector<int> a;
-	try {
-		readFromBinary(a, argv[1]);
-	}
-	catch(const std::exception& e) {
-		std::cout << e.what();
-		return 0;
-	}
-	std::vector<int> b = a;
-	std::vector<int> result(a.size(), 0);
 	omp_set_num_threads(omp_get_max_threads());
-
 	std::string op = argv[2];
-	std::function<void(const std::vector<int>& a, const std::vector<int>& b, std::vector<int>& result)> matrix_func;
-	matrix_func = op == "m" ? matrixMul : matrixAdd;
-	auto time = measureTime(a, b, result, matrix_func);
-	std::cout << time;
+	std::string dataType = argv[3];
+	std::string fileName = argv[1];
+	if(dataType == "i") {
+		calculate<int>(op, fileName);
+	}
+	else if(dataType == "f") {
+		calculate<float>(op, fileName);
+	}
 }
 
