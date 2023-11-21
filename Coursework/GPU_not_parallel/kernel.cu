@@ -12,9 +12,8 @@
 template <typename T>
 __global__ void matrixMulKernel(T* c, const T* a, const T* b, size_t N) {
 	for(int i = 0; i < N; i++) {
-		for(int j = 0; j < N; j++) {
-			c[i * N + j] = 0;
-			for(int k = 0; k < N; k++) {
+		for(int k = 0; k < N; k++) {
+			for(int j = 0; j < N; j++) {
 				c[i * N + j] += a[i * N + k] * b[k * N + j];
 			}
 		}

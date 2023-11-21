@@ -24,9 +24,8 @@ void matrixMul(const std::vector<T>& a, const std::vector<T>& b, std::vector<T>&
 	size_t size = sqrt(a.size());
 	int j, k, i;
 	for(i = 0; i < size; i++) {
-		for(j = 0; j < size; j++) {
-			result[i * size + j] = 0;
-			for(k = 0; k < size; k++) {
+		for(k = 0; k < size; k++) {
+			for(j = 0; j < size; j++) {
 				result[i * size + j] += a[i * size + k] * b[k * size + j];
 			}
 		}
