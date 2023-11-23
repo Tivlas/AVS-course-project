@@ -9,8 +9,8 @@
 
 template <typename T>
 __global__ void matrixMulKernel(T* c, const T* a, const T* b, size_t N) {
-	size_t i = blockIdx.x * blockDim.x + threadIdx.x;
-	size_t j = blockIdx.y * blockDim.y + threadIdx.y;
+	size_t j = blockIdx.x * blockDim.x + threadIdx.x;
+	size_t i = blockIdx.y * blockDim.y + threadIdx.y;
 	if(i < N && j < N) {
 		auto idx = i * N + j;
 		c[idx] = 0;
