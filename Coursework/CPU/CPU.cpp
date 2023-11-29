@@ -24,7 +24,7 @@ template <typename T>
 void matrixMul(const std::vector<T>& a, const std::vector<T>& b, std::vector<T>& result) {
 	size_t size = sqrt(a.size());
 	int j, k;
-#pragma omp parallel for private(j, k)
+#pragma omp parallel for
 	for(int i = 0; i < size; i++) {
 		for(k = 0; k < size; k++) {
 			for(j = 0; j < size; j++) {
@@ -38,7 +38,7 @@ template <typename T>
 void matrixAdd(const std::vector<T>& a, const std::vector<T>& b, std::vector<T>& result) {
 	size_t size = a.size();
 	int i;
-#pragma omp parallel for private(i) 
+#pragma omp parallel for
 	for(i = 0; i < size; i++) {
 		result[i] = a[i] + b[i];
 	}
