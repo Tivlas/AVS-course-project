@@ -7,7 +7,7 @@
 #include <type_traits>
 
 template <typename T>
-void SaveToBinary(const thrust::host_vector<T>& v, const std::string& filename) {
+void saveToBinary(const thrust::host_vector<T>& v, const std::string& filename) {
 	std::ofstream file(filename, std::ios::binary | std::ios::trunc | std::ios::out);
 	file.seekp(0);
 	size_t size = v.size();
@@ -40,7 +40,7 @@ void generate(const std::string& fileName, size_t size) {
 	thrust::device_vector<T> a(size);
 	thrust::transform(thrust::make_counting_iterator(0ULL), thrust::make_counting_iterator(static_cast<unsigned long long>(size)), a.begin(), GenRand<T>());
 	thrust::host_vector<T> a_copy = a;
-	SaveToBinary<T>(a_copy, fileName);
+	saveToBinary<T>(a_copy, fileName);
 }
 
 int main(int argc, char* argv[]) {
