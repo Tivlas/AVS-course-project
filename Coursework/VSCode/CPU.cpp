@@ -39,13 +39,16 @@ void matrixMul(const std::vector<T>& a, const std::vector<T>& b,
 }
 
 template <typename T>
-void matrixAdd(const std::vector<T>& a, const std::vector<T>& b,
-               std::vector<T>& result) {
-    size_t size = a.size();
-    int i;
-#pragma omp parallel for
-    for (i = 0; i < size; i++) {
-        result[i] = a[i] + b[i];
+void matrixMulNotParallel(const std::vector<T>& a, const std::vector<T>& b,
+                          std::vector<T>& result) {
+    size_t size = sqrt(a.size());
+    int j, k;
+    for (int i = 0; i < size; i++) {
+        for (k = 0; k < size; k++) {
+            for (j = 0; j < size; j++) {
+                result[i * size + j] += a[i * size + k] * b[k * size + j];
+            }
+        }
     }
 }
 
@@ -62,13 +65,16 @@ void printProgressIndicator(std::atomic<bool>& isCalculating) {
 }
 
 template <typename T>
-auto measureTime(
-    const std::vector<T>& a, const std::vector<T>& b, std::vector<T>& result,
-    std::function<void(const std::vector<T>& a, const std::vector<T>& b,
-                       std::vector<T>& result)>
-        matrix_func) {
+auto measureTime(const std::vector<T>& a, const std::vector<T>& b,
+                 std::vector<T>& result, const std::string& operationType) {
     auto start = std::chrono::high_resolution_clock::now();
-    matrix_func(a, b, result);
+    if (operationType == "p") {
+        matrixMul(a, b, result);
+    } else if (operationType == "np") {
+        matrixMulNotParallel(a, b, result);
+    } else {
+        throw std::invalid_argument("Invalid operationType argument!");
+    }
     auto end = std::chrono::high_resolution_clock::now();
     auto elapsed_time =
         std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
@@ -77,7 +83,8 @@ auto measureTime(
 
 template <typename T>
 void calculate(const std::vector<std::filesystem::path>& filePaths,
-               const std::filesystem::path& outFileName) {
+               const std::filesystem::path& outFileName,
+               const std::string& operationType) {
     std::fstream outfile(outFileName, std::ios::trunc | std::ios::out);
     if (!outfile.is_open()) {
         throw std::invalid_argument("Invalid outFileName! " +
@@ -92,11 +99,7 @@ void calculate(const std::vector<std::filesystem::path>& filePaths,
         readFromBinary(a, filePath);
         std::vector<T> b = a;
         std::vector<T> result(a.size(), 0);
-        std::function<void(const std::vector<T>& a, const std::vector<T>& b,
-                           std::vector<T>& result)>
-            matrix_func;
-        matrix_func = matrixMul<T>;
-        auto time = measureTime<T>(a, b, result, matrix_func);
+        auto time = measureTime<T>(a, b, result, operationType);
         outfile << std::to_string(time) + "    " +
                        filePath.filename().string() + "\n";
     }
@@ -109,6 +112,12 @@ int main(int argc, char* argv[]) {
     omp_set_num_threads(omp_get_max_threads());
     std::filesystem::path outFileName = std::filesystem::absolute(argv[1]);
     std::string dataDir = argv[2];
+    std::string operationType = argv[3];
+    if (operationType != "p" && operationType != "np") {
+        std::cout << "3rd argument nust be equal to p (parallel) or np (not "
+                     "parallel)!";
+        return 0;
+    }
     std::filesystem::directory_iterator iterator(dataDir);
     std::vector<std::filesystem::path> fileNames;
     for (const auto& entry : iterator) {
@@ -118,5 +127,5 @@ int main(int argc, char* argv[]) {
             fileNames.push_back(filePath);
         }
     }
-    calculate<float>(fileNames, outFileName);
+    calculate<float>(fileNames, outFileName, operationType);
 }
